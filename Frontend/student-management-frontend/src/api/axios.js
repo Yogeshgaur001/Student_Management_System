@@ -7,15 +7,21 @@ const instance = axios.create({
   }
 });
 
-// Debug request
+// Attach token before every request
 instance.interceptors.request.use(
   (config) => {
+    const token = localStorage.getItem('token'); // 🔑 retrieve token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     console.log('🚀 Request:', {
       url: config.url,
       method: config.method,
       data: config.data,
       headers: config.headers
     });
+
     return config;
   },
   (error) => {

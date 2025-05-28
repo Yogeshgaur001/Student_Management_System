@@ -1,0 +1,107 @@
+.students-container {
+  padding: 2rem;
+  background-color: #f4f7fa;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.students-container h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.students-table th {
+  padding: 12px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 2px solid #90caf9;
+  background-color: #e3f2fd;
+  text-align: left;
+}
+
+.students-table td {
+  padding: 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ddd;
+}
+
+.students-table img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.button-view {
+  margin-right: 10px;
+  padding: 6px 12px;
+  background-color: #43a047;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-edit {
+  margin-right: 10px;
+  padding: 6px 12px;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-delete {
+  padding: 6px 12px;
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+}
+
+.modal-content img {
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}

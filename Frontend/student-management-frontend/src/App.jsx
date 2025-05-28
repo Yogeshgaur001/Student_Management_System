@@ -6,6 +6,8 @@ import CreateStudent from './pages/CreateStudent';
 import ProtectedRoute from './components/ProtectedRoute';
 import EditStudent from './pages/EditStudent'; 
 import Register from './pages/Register';
+import ViewStudent from './pages/ViewStudent';
+
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateStudent /></ProtectedRoute>} />
         <Route path="/edit/:id" element={<ProtectedRoute><EditStudent /></ProtectedRoute>} />
+        <Route path="/view/:id" element={<ProtectedRoute><ViewStudent /></ProtectedRoute>} />
+
 
       </Routes>
     </Router>

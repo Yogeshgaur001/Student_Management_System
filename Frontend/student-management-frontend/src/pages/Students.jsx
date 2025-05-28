@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from '../api/axios';
+import './Student.css'; // ✅ Corrected path if CSS is in the same folder
 
 export default function Students() {
   const [students, setStudents] = useState([]);
-  const navigate = useNavigate();
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchStudents();
@@ -17,58 +19,54 @@ export default function Students() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure to delete?')) {
       await axios.delete(`/students/${id}`);
-      fetchStudents(); // refresh list
+      fetchStudents();
     }
   };
 
-  return (
-    <div
-      style={{
-        padding: '2rem',
-        backgroundColor: '#f4f7fa',
-        minHeight: '100vh',
-        fontFamily: 'Arial, sans-serif',
-      }}
-    >
-      <h2 style={{ marginBottom: '1.5rem', color: '#333' }}>📋 All Students</h2>
+  const handleView = (student) => {
+    setSelectedStudent(student);
+    setShowModal(true);
+  };
 
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          backgroundColor: '#fff',
-          boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-        }}
-      >
+  const closeModal = () => {
+    setSelectedStudent(null);
+    setShowModal(false);
+  };
+
+  return (
+    <div className="students-container">
+      <h2>📋 All Students</h2>
+
+      <table className="students-table">
         <thead>
-          <tr style={{ backgroundColor: '#e3f2fd', textAlign: 'left' }}>
-            <th style={thStyle}>Name</th>
-            <th style={thStyle}>Email</th>
-            <th style={thStyle}>Photo</th>
-            <th style={thStyle}>Actions</th>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Photo</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {students.map((s) => (
-            <tr key={s.id} style={{ borderBottom: '1px solid #ddd' }}>
-              <td style={tdStyle}>{s.name}</td>
-              <td style={tdStyle}>{s.email}</td>
-              <td style={tdStyle}>
+            <tr key={s.id}>
+              <td>{s.name}</td>
+              <td>{s.email}</td>
+              <td>
                 <img
                   src={`http://localhost:3000/uploads/${s.photo}`}
                   width="50"
                   height="50"
-                  style={{ borderRadius: '50%', objectFit: 'cover' }}
                   alt="student"
                 />
               </td>
-              <td style={tdStyle}>
+              <td>
+                <button onClick={() => handleView(s)} className="button-view">View</button>
                 <Link to={`/edit/${s.id}`}>
-                  <button style={editButtonStyle}>Edit</button>
+                  <button className="button-edit">Edit</button>
                 </Link>
                 <button
                   onClick={() => handleDelete(s.id)}
-                  style={deleteButtonStyle}
+                  className="button-delete"
                 >
                   Delete
                 </button>
@@ -77,37 +75,26 @@ export default function Students() {
           ))}
         </tbody>
       </table>
+
+      {showModal && selectedStudent && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button onClick={closeModal} className="modal-close">✖</button>
+            <h3>🎓 Student Details</h3>
+            <img
+              src={`http://localhost:3000/uploads/${selectedStudent.photo}`}
+              alt="Student"
+              width="100"
+              height="100"
+            />
+            <p><strong>Name:</strong> {selectedStudent.name}</p>
+            <p><strong>Email:</strong> {selectedStudent.email}</p>
+            <p><strong>DOB:</strong> {selectedStudent.dob}</p>
+            <p><strong>semester:</strong> {selectedStudent.semester}</p>
+            <p><strong>Branch:</strong> {selectedStudent.branch}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-const thStyle = {
-  padding: '12px',
-  fontWeight: 'bold',
-  color: '#333',
-  borderBottom: '2px solid #90caf9',
-};
-
-const tdStyle = {
-  padding: '12px',
-  verticalAlign: 'middle',
-};
-
-const editButtonStyle = {
-  marginRight: '10px',
-  padding: '6px 12px',
-  backgroundColor: '#1976d2',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-};
-
-const deleteButtonStyle = {
-  padding: '6px 12px',
-  backgroundColor: '#e53935',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-};

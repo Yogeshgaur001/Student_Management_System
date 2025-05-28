@@ -5,26 +5,31 @@ import { Student } from './student.model';
 @Injectable()
 export class StudentService {
   constructor(
-    @InjectModel(Student) private studentModel: typeof Student,
+    @InjectModel(Student) private readonly studentModel: typeof Student,
   ) {}
 
-  create(student: any) {
-    return this.studentModel.create(student);
+  // ✅ Create student
+  async create(student: any): Promise<Student> {
+    return await this.studentModel.create(student);
   }
 
-  findAll() {
-    return this.studentModel.findAll();
+  // ✅ Get all students
+  async findAll(): Promise<Student[]> {
+    return await this.studentModel.findAll();
   }
 
-  findOne(id: number) {
-    return this.studentModel.findByPk(id);
+  // ✅ Get one student by ID
+  async findOne(id: number): Promise<Student | null> {
+    return await this.studentModel.findByPk(id);
   }
 
-  update(id: number, student: any) {
-    return this.studentModel.update(student, { where: { id } });
+  // ✅ Update student
+  async update(id: number, student: any): Promise<[number]> {
+    return await this.studentModel.update(student, { where: { id } });
   }
 
-  delete(id: number) {
-    return this.studentModel.destroy({ where: { id } });
+  // ✅ Delete student
+  async delete(id: number): Promise<number> {
+    return await this.studentModel.destroy({ where: { id } });
   }
 }

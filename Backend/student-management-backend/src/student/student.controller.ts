@@ -8,12 +8,14 @@ import {
   Put,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { StudentService } from './student.service';
+import { CreateStudentDto } from './dto/create-student.dto';
 
 @Controller('students')
 @UseGuards(JwtAuthGuard)
@@ -24,20 +26,29 @@ export class StudentController {
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads', // This folder must exist or be created
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
+          const ext = extname(file.originalname);
+          cb(null, `photo-${uniqueSuffix}${ext}`);
         },
       }),
     }),
   )
-  uploadPhoto(
+  async uploadStudent(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
+    @Body() body: CreateStudentDto,
   ) {
-    const studentData = { ...body, photo: file.filename };
-    return this.studentService.create(studentData);
+    if (file) {
+      body.photo = file.filename;
+    }
+    console.log(create student body', body);
+    return this.studentService.create(body);
+  }
+
+  @Get()
+  async findAll() {
+    return this.studentService.findAll();
   }
 
   @Put(':id')
