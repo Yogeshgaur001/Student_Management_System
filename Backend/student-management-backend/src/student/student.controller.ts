@@ -42,7 +42,7 @@ export class StudentController {
     if (file) {
       body.photo = file.filename;
     }
-    console.log(create student body', body);
+    console.log('create student body', body);
     return this.studentService.create(body);
   }
 
