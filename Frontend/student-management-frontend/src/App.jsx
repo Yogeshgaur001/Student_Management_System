@@ -13,14 +13,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
         <Route path="/create" element={<ProtectedRoute><CreateStudent /></ProtectedRoute>} />
         <Route path="/edit/:id" element={<ProtectedRoute><EditStudent /></ProtectedRoute>} />
         <Route path="/view/:id" element={<ProtectedRoute><ViewStudent /></ProtectedRoute>} />
-
+        <Route path="/logout" element={<Login />} />
 
       </Routes>
     </Router>

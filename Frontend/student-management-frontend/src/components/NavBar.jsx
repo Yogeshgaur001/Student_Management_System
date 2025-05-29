@@ -1,77 +1,4 @@
-// Create a new file src/components/Navbar.jsx
-/*import { Link, useNavigate } from 'react-router-dom';
-
-export default function Navbar() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-  };
-
-  return (
-    <nav style={{
-      backgroundColor: '#fff',
-      padding: '1rem 2rem',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      width: '100%',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      zIndex: 1000,
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        gap: '2rem', 
-        alignItems: 'center' 
-      }}>
-        <Link to="/dashboard" style={{
-          color: '#2196F3',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          fontSize: '1.2rem'
-        }}>
-          🎓 Student Manager
-        </Link>
-        <div style={{ display: 'flex', gap: '1.5rem' }}>
-          <Link to="/dashboard" style={{
-            color: '#666',
-            textDecoration: 'none',
-            fontWeight: '500'
-          }}>Dashboard</Link>
-          <Link to="/students" style={{
-            color: '#666',
-            textDecoration: 'none',
-            fontWeight: '500'
-          }}>Students</Link>
-        </div>
-      </div>
-      <button 
-        onClick={handleLogout}
-        style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: '#ff4757',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontWeight: '500',
-          transition: 'background 0.2s'
-        }}
-        onMouseOver={e => e.target.style.backgroundColor = '#ff6b81'}
-        onMouseOut={e => e.target.style.backgroundColor = '#ff4757'}
-      >
-        Logout
-      </button>
-    </nav>
-  );
-}*/
-
-
-import { useState, useEffect } from 'react';
+/*import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
@@ -103,32 +30,35 @@ export default function Navbar() {
     setActiveItem(item);
     setIsMobileMenuOpen(false);
 
-    if (item === 'home' || item === 'dashboard') {
-      navigate('/dashboard');
-    } else {
-      navigate(`/${item}`);
-    }
+    if (item === 'home') {
+  navigate('/');
+} else if (item === 'dashboard') {
+  navigate('/dashboard');
+} else {
+  navigate(`/${item}`);
+}
+
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setActiveItem('dashboard');
-    navigate('/login');
+    navigate('/login', { replace: true }); 
   };
 
   return (
     <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ease-in-out ${isScrolled ? 'bg-white shadow-lg' : 'bg-white/80 backdrop-blur-sm'}`}>
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16">*/
           {/* Logo */}
-          <div className="flex items-center flex-shrink-0">
+          /*<div className="flex items-center flex-shrink-0">
             <button onClick={() => handleNavClick('home')} className="text-xl font-bold text-gray-800">
               Student Management
             </button>
-          </div>
+          </div>*/
 
           {/* Desktop Navigation */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+         /* <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
             {['home', 'students', 'courses', 'reports'].map((item) => (
               <button
                 key={item}
@@ -142,10 +72,10 @@ export default function Navbar() {
                 {item.charAt(0).toUpperCase() + item.slice(1)}
               </button>
             ))}
-          </div>
+          </div>*/
 
           {/* User Menu */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          /*<div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="relative ml-3">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -175,10 +105,10 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-          </div>
+          </div>*/
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center -mr-2 sm:hidden">
+          /*<div className="flex items-center -mr-2 sm:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 text-gray-400 rounded-md hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
@@ -205,10 +135,10 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-      </div>
+      </div>*/
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
+      /*{isMobileMenuOpen && (
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
             {['home', 'students', 'courses', 'reports', 'settings'].map((item) => (
@@ -235,4 +165,44 @@ export default function Navbar() {
       )}
     </nav>
   );
+}*/
+
+
+// components/Navbar.jsx
+// Navbar.jsx
+import { Link, useLocation } from 'react-router-dom';
+import './Navbar.css'; // Optional CSS styling
+import { NavLink } from 'react-router-dom';
+
+export default function Navbar() {
+  const location = useLocation();
+
+  // Determine page heading based on pathname
+  const getHeading = () => {
+    switch (location.pathname) {
+      case '/students':
+        return '📋 All Students';
+      case '/create':
+        return '➕ Create Student';
+      case '/':
+        return '🏠 Home';
+      default:
+        return '📚 Student Dashboard';
+    }
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-brand">🎓Student Management System</div>
+      <h1 className="navbar-heading">{getHeading()}</h1>
+
+      <ul className="navbar-links">
+        <li><NavLink to="/" data-tooltip="Home">Home</NavLink></li>
+        <li><NavLink to="/students" data-tooltip="Student list">Students list</NavLink></li>
+        <li><NavLink to="/create" data-tooltip="Add Student">Add Student</NavLink></li>
+        <li><NavLink to="/logout" data-tooltip="Logout">Logout</NavLink></li>
+      </ul>
+    </nav>
+  );
 }
+

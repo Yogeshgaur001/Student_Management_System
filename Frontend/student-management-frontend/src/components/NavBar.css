@@ -1,0 +1,72 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #7b90f7, #7a5bf5);
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.navbar-links a,
+.logout-btn {
+  position: relative;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Hover effect */
+/* Hover effect - Light Yellow background */
+.navbar-links a:hover,
+.logout-btn:hover {
+  background-color: #fff9c4; /* Light yellow */
+  color: black; /* Optional for better contrast */
+}
+
+/* Tooltip on hover */
+.navbar-links a:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Active link styling */
+.navbar-links a.active,
+.navbar-links a[aria-current="page"] {
+  background-color: red; /* Background stays red */
+  color: white;
+  font-weight: bold;
+}

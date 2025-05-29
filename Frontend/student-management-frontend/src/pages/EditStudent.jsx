@@ -2,6 +2,8 @@ import { useForm } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from '../api/axios';
+import './EditStudent.css';
+
 
 export default function EditStudent() {
   const { id } = useParams();
@@ -17,7 +19,7 @@ export default function EditStudent() {
       }
       setPhotoPreview(`http://localhost:3000/uploads/${student.photo}`);
     });
-  }, [id]);
+  }, [id, setValue]);
 
   const onSubmit = async (data) => {
     try {
@@ -29,15 +31,51 @@ export default function EditStudent() {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/students');
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input placeholder="Name" {...register('name')} />
-      <input placeholder="Email" type="email" {...register('email')} />
-      <input placeholder="DOB" type="date" {...register('dob')} />
-      <input placeholder="Branch" {...register('branch')} />
-      <input placeholder="Semester" {...register('semester')} />
-      {photoPreview && <img src={photoPreview} width="80" />}
-      <button type="submit">Update</button>
-    </form>
+    <div className="edit-student-container">
+      <h2>✏️ Edit Student</h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="edit-form-group">
+          <label htmlFor="name">Name</label>
+          <input id="name" placeholder="Name" {...register('name')} />
+        </div>
+
+        <div className="edit-form-group">
+          <label htmlFor="email">Email</label>
+          <input id="email" placeholder="Email" type="email" {...register('email')} />
+        </div>
+
+        <div className="edit-form-group">
+          <label htmlFor="dob">Date of Birth</label>
+          <input id="dob" type="date" {...register('dob')} />
+        </div>
+
+        <div className="edit-form-group">
+          <label htmlFor="branch">Branch</label>
+          <input id="branch" placeholder="Branch" {...register('branch')} />
+        </div>
+
+        <div className="edit-form-group">
+          <label htmlFor="semester">Semester</label>
+          <input id="semester" placeholder="Semester" {...register('semester')} />
+        </div>
+
+        {photoPreview && (
+          <div className="edit-form-group">
+            <label>Current Photo</label>
+            <img src={photoPreview} alt="Student" />
+          </div>
+        )}
+
+        <div className="edit-buttons">
+          <button type="submit" className="edit-button-save">Save Changes</button>
+          <button type="button" className="edit-button-cancel" onClick={handleCancel}>Cancel</button>
+        </div>
+      </form>
+    </div>
   );
 }
