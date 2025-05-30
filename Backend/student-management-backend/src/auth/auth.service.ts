@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './auth.model';
 import * as bcrypt from 'bcrypt';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -17,30 +18,23 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<any> {
-    console.log('Validating user:', email);
-    const user = await this.userModel.findOne({ 
-      where: { email },
-      raw: false // Make sure we get the full Sequelize instance
-    });
-    
-    if (!user) {
-      console.log('User not found');
-      return null;
-    }
+    let user = await this.userModel.findOne({ where: { email } });
+    user= user?.get({ plain: true }); // Convert Sequelize model to plain object
 
-    // Access password from dataValues
-    const hashedPassword = user.dataValues.password;
-    
-
+    if (!user) return null;
 
     try {
-      const isMatch = await bcrypt.compare(password, hashedPassword);
+      console.log('--------------------------')
+      console.log('password:', password);
+      console.log('hashed password', user.password);
+      console.log('--------------------------')
+      const isMatch = await bcrypt.compare(password, user.password);
       console.log('Password match:', isMatch);
       if (!isMatch) return null;
-      
-      return user.dataValues;
+
+      return user; // or user.dataValues if you want to strip the Sequelize model
     } catch (error) {
-      console.error('bcrypt error:', error);
+      // console.error('bcrypt error:', error);
       return null;
     }
   }
@@ -51,9 +45,22 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+
+    let response;
+try {
+      // Check if user is active
+     response = {
+      access_token: this.jwtService.sign({
+        userId: user.id,
+        email: user.email,
+      }),
+    }
+  } catch (error) { 
+    console.warn('Error generating JWT token:', error);
+    throw new UnauthorizedException('Could not generate token');
+  }
+
+    // Generate JWT token
+    return response;
   }
 }

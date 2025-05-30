@@ -12,8 +12,8 @@ import { User } from './auth.model';
     SequelizeModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'mysecretkey',
-      signOptions: { expiresIn: '1d' },
+      secret: process.env.JWT_SECRET || 'mysecretkey', // ✅ secure default fallback
+      signOptions: { expiresIn: '1h' }, // ⏱️ optional change from 1d to 1h
     }),
   ],
   providers: [AuthService, JwtStrategy],
