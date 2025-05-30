@@ -1,46 +1,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import axios from '../api/axios';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError('');
+  // ✅ React Query Mutation
+  const loginMutation = useMutation({
+    mutationFn: async ({ email, password }) => {
+      const response = await axios.post('/auth/login', { email, password });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        navigate('/dashboard');
+      } else {
+        setFormError('Invalid response from server');
+      }
+    },
+    onError: (error) => {
+      setFormError(error.response?.data?.message || 'Login failed');
+    }
+  });
 
-    // Validate inputs
+  const handleLogin = () => {
+    setFormError('');
+
     if (!email || !password) {
-      setError('Email and password are required');
-      setLoading(false);
+      setFormError('Email and password are required');
       return;
     }
 
-    try {
-      console.log('Attempting login:', { email, password });
-      const response = await axios.post('/auth/login', { 
-        email, 
-        password 
-      });
-      
-      console.log('Login response:', response.data);
-      
-      if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token);
-        navigate('/dashboard');
-      } else {
-        setError('Invalid response from server');
-      }
-    } catch (err) {
-      console.error('Login error:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Invalid email or password');
-    } finally {
-      setLoading(false);
-    }
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -76,71 +72,45 @@ export default function Login() {
             justifyContent: 'center',
             marginBottom: '1.2rem',
             boxShadow: '0 2px 8px 0 rgba(60, 80, 180, 0.10)',
-        }}>
+          }}
+        >
           <svg width="32" height="32" fill="#2575fc" viewBox="0 0 24 24">
             <path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 100-8 4 4 0 000 8z"/>
           </svg>
         </div>
-        <h2 style={{ marginBottom: '1.2rem', color: '#2575fc', fontWeight: 700, letterSpacing: 1 }}>Welcome Back</h2>
+        <h2 style={{ marginBottom: '1.2rem', color: '#2575fc', fontWeight: 700, letterSpacing: 1 }}>
+          Welcome Back
+        </h2>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            marginBottom: '1rem',
-            border: '1px solid #e0e7ef',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            outline: 'none',
-            background: '#f8fafc',
-            transition: 'border 0.2s',
-          }}
+          style={inputStyle}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            marginBottom: '1rem',
-            border: '1px solid #e0e7ef',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            outline: 'none',
-            background: '#f8fafc',
-            transition: 'border 0.2s',
-          }}
+          style={inputStyle}
         />
         <button
           onClick={handleLogin}
-          disabled={loading}
+          disabled={loginMutation.isLoading}
           style={{
-            width: '100%',
-            padding: '0.75rem',
-            background: loading
+            ...buttonStyle,
+            background: loginMutation.isLoading
               ? '#b2bec3'
               : 'linear-gradient(90deg, #a1c4fd 0%, #2575fc 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            marginBottom: '1rem',
-            transition: 'background 0.2s',
-            boxShadow: '0 2px 8px 0 rgba(60, 80, 180, 0.08)',
+            cursor: loginMutation.isLoading ? 'not-allowed' : 'pointer',
           }}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loginMutation.isLoading ? 'Logging in...' : 'Login'}
         </button>
-        {error && (
+        {(formError || loginMutation.isError) && (
           <div style={{ color: '#e74c3c', marginBottom: '1rem', fontWeight: 'bold' }}>
-            {error}
+            {formError}
           </div>
         )}
         <div style={{ fontSize: '0.95rem', color: '#636e72' }}>
@@ -161,3 +131,28 @@ export default function Login() {
     </div>
   );
 }
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.75rem',
+  marginBottom: '1rem',
+  border: '1px solid #e0e7ef',
+  borderRadius: '8px',
+  fontSize: '1rem',
+  outline: 'none',
+  background: '#f8fafc',
+  transition: 'border 0.2s',
+};
+
+const buttonStyle = {
+  width: '100%',
+  padding: '0.75rem',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  fontSize: '1rem',
+  fontWeight: 'bold',
+  marginBottom: '1rem',
+  transition: 'background 0.2s',
+  boxShadow: '0 2px 8px 0 rgba(60, 80, 180, 0.08)',
+};

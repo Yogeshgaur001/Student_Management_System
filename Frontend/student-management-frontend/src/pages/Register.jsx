@@ -1,45 +1,35 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import axios from '../api/axios';
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = async () => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    // Validate inputs
-    if (!email || !password) {
-      setError('Email and password are required');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      console.log('Attempting registration:', { email, password });
-      const response = await axios.post('/auth/register', { 
-        email, 
-        password 
-      });
-      
-      console.log('Registration response:', response.data);
+  // React Query mutation for registration
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+      const res = await axios.post('/auth/register', { email, password });
+      return res.data;
+    },
+    onSuccess: () => {
       setSuccess('Registration successful! Redirecting to login...');
-      
-      // Delay navigation to show success message
       setTimeout(() => navigate('/'), 1500);
-    } catch (err) {
-      console.error('Registration error:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    },
+    onError: (err) => {
+      setSuccess('');
+    },
+  });
+
+  const handleRegister = () => {
+    setSuccess('');
+    registerMutation.mutate();
   };
 
   return (
@@ -66,42 +56,22 @@ export default function Register() {
           placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            marginBottom: '1rem',
-            border: '1px solid #e0e7ef',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            outline: 'none',
-            background: '#f8fafc',
-            transition: 'border 0.2s',
-          }}
+          style={inputStyle}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.75rem',
-            marginBottom: '1rem',
-            border: '1px solid #e0e7ef',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            outline: 'none',
-            background: '#f8fafc',
-            transition: 'border 0.2s',
-          }}
+          style={inputStyle}
         />
         <button
           onClick={handleRegister}
-          disabled={loading}
+          disabled={registerMutation.isLoading}
           style={{
             width: '100%',
             padding: '0.75rem',
-            background: loading
+            background: registerMutation.isLoading
               ? '#b2bec3'
               : 'linear-gradient(90deg, #a1c4fd 0%, #2575fc 100%)',
             color: '#fff',
@@ -109,17 +79,18 @@ export default function Register() {
             borderRadius: '8px',
             fontSize: '1rem',
             fontWeight: 'bold',
-            cursor: loading ? 'not-allowed' : 'pointer',
+            cursor: registerMutation.isLoading ? 'not-allowed' : 'pointer',
             marginBottom: '1rem',
             transition: 'background 0.2s',
             boxShadow: '0 2px 8px 0 rgba(60, 80, 180, 0.08)',
           }}
         >
-          {loading ? 'Registering...' : 'Register'}
+          {registerMutation.isLoading ? 'Registering...' : 'Register'}
         </button>
-        {error && (
+
+        {registerMutation.error && (
           <div style={{ color: '#e74c3c', marginBottom: '1rem', fontWeight: 'bold' }}>
-            {error}
+            {registerMutation.error.message}
           </div>
         )}
         {success && (
@@ -145,3 +116,15 @@ export default function Register() {
     </div>
   );
 }
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.75rem',
+  marginBottom: '1rem',
+  border: '1px solid #e0e7ef',
+  borderRadius: '8px',
+  fontSize: '1rem',
+  outline: 'none',
+  background: '#f8fafc',
+  transition: 'border 0.2s',
+};

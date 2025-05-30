@@ -1,72 +1,97 @@
-.navbar {
+/* Base styles */
+.nav {
+  background-color: #1a2b4c;
+  padding: 0.75rem 2rem;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(to right, #7b90f7, #7a5bf5);
-  padding: 1rem 2rem;
-  color: white;
+  flex-wrap: wrap;
 }
 
-.navbar-brand {
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.navbar-heading {
+.nav-logo {
   font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.navbar-links {
-  display: flex;
-  gap: 1.5rem;
-  list-style: none;
-}
-
-.navbar-links a,
-.logout-btn {
-  position: relative;
+  font-weight: bold;
   color: white;
+}
+
+/* Navigation links */
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+.nav-links a,
+.logout-btn {
   text-decoration: none;
+  color: white;
   font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
-}
-
-/* Hover effect */
-/* Hover effect - Light Yellow background */
-.navbar-links a:hover,
-.logout-btn:hover {
-  background-color: #fff9c4; /* Light yellow */
-  color: black; /* Optional for better contrast */
-}
-
-/* Tooltip on hover */
-.navbar-links a:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: -2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 0.3rem 0.6rem;
+  padding: 0.5rem 1rem;
   border-radius: 5px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  opacity: 0.9;
-  pointer-events: none;
-  z-index: 10;
 }
 
-/* Active link styling */
-.navbar-links a.active,
-.navbar-links a[aria-current="page"] {
-  background-color: red; /* Background stays red */
+.nav-links a:hover,
+.logout-btn:hover {
+  background-color: #007bff;
   color: white;
-  font-weight: bold;
+}
+
+.nav-links a.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Hamburger menu */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.nav-toggle span {
+  height: 3px;
+  width: 25px;
+  background-color: white;
+  border-radius: 3px;
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+    background-color: #1a2b4c;
+    padding: 1rem;
+    border-radius: 10px;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-links li {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links a,
+  .logout-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
 }

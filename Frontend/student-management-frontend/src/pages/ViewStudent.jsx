@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import axios from '../api/axios';
+
+const fetchStudent = async (id) => {
+  const res = await axios.get(`/students/${id}`);
+  return res.data;
+};
 
 export default function ViewStudent() {
   const { id } = useParams();
-  const [student, setStudent] = useState(null);
 
-  useEffect(() => {
-    axios.get(`/students/${id}`)
-      .then(res => setStudent(res.data))
-      .catch(err => console.error("Error fetching student:", err));
-  }, [id]);
+  const { data: student, isLoading, isError } = useQuery({
+    queryKey: ['student', id],
+    queryFn: () => fetchStudent(id),
+    enabled: !!id, // only run when id is available
+  });
 
-  if (!student) {
-    return <div style={{ padding: '2rem' }}>Loading...</div>;
-  }
+  if (isLoading) return <div style={{ padding: '2rem' }}>Loading...</div>;
+  if (isError) return <div style={{ padding: '2rem' }}>Error loading student.</div>;
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>

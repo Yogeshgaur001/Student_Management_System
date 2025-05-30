@@ -1,14 +1,15 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // ⬅️ import navigate
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './CreateStudent.css';
-import NavBar from '../components/NavBar'; // Adjust the import path as necessary
+import NavBar from '../components/NavBar';
+import { useMutation } from '@tanstack/react-query';
 
 const CreateStudent = () => {
-  const navigate = useNavigate(); // ⬅️ initialize navigate
+  const navigate = useNavigate();
 
   const {
     register,
@@ -17,8 +18,9 @@ const CreateStudent = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    try {
+  // ✅ React Query Mutation for student creation
+  const mutation = useMutation({
+    mutationFn: async (data) => {
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('email', data.email);
@@ -40,23 +42,45 @@ const CreateStudent = () => {
         }
       );
 
-      console.log('✅ Student created:', response.data);
-      reset();
+      return response.data;
+    },
+    onSuccess: (data) => {
       toast.success('🎉 Student created successfully!');
+      reset();
 
-      // Wait 2 seconds and redirect to /students
       setTimeout(() => {
-        navigate('/students'); // ⬅️ redirect after success
+        navigate('/students');
       }, 2000);
-    } catch (error) {
-      console.error('❌ Error creating student:', error.response?.data || error);
-      toast.error('❌ Failed to create student.');
-    }
+    },
+ onError: (error) => {
+  console.error('❌ Error:', error);
+  if (error.response) {
+    console.error('❌ Response:', error.response.data);
+  }
+  toast.error('❌ Failed to create student.');
+}
+
+  });
+
+  const onSubmit = (data) => {
+    mutation.mutate(data);
   };
 
   return (
     <>
       <NavBar />
+
+  <h2 style={{ 
+  fontSize: '2rem', 
+  fontWeight: 'bold', 
+  margin: '1.5rem auto', 
+  color: '#333',
+  textAlign: 'center',
+  width: '100%'
+}}>
+  ➕ Add Student
+</h2>
+
       <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
         <div>
           <label>Name:</label>
@@ -109,7 +133,9 @@ const CreateStudent = () => {
           <input type="file" {...register('photo')} accept="image/*" />
         </div>
 
-        <button type="submit">Create Student</button>
+        <button type="submit" disabled={mutation.isLoading}>
+          {mutation.isLoading ? 'Creating...' : 'Create Student'}
+        </button>
       </form>
 
       <ToastContainer position="top-center" autoClose={3000} />

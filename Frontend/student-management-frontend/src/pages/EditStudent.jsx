@@ -1,39 +1,77 @@
 import { useForm } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from '../api/axios';
 import './EditStudent.css';
 
-
 export default function EditStudent() {
   const { id } = useParams();
+  console.log("EditStudent ID:", id); // Debugging line
   const { register, handleSubmit, setValue } = useForm();
   const navigate = useNavigate();
   const [photoPreview, setPhotoPreview] = useState(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    axios.get(`/students/${id}`).then((res) => {
-      const student = res.data;
-      for (let key in student) {
-        setValue(key, student[key]);
-      }
-      setPhotoPreview(`http://localhost:3000/uploads/${student.photo}`);
-    });
-  }, [id, setValue]);
-
-  const onSubmit = async (data) => {
+  // ✅ Fetch student data
+const { data: studentData, isLoading, isError } = useQuery({
+  queryKey: ['student', id],
+  queryFn: async () => {
     try {
-      await axios.put(`/students/${id}`, data);
-      alert('Student updated');
-      navigate('/students');
-    } catch {
-      alert('Failed to update');
+      console.log("Fetching student data for ID:", id);
+      const res = await axios.get(`/students/${id}`);
+      console.log("Fetched student data:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+      throw new Error("Failed to fetch student data");
     }
+  },
+  enabled: !!id, // Optional: avoids running if id is undefined
+});
+
+  // ✅ Populate form when data loads
+ useEffect(() => {
+  if (studentData && Object.keys(studentData).length > 0) {
+    Object.keys(studentData).forEach((key) => {
+      if (studentData[key] !== undefined) {
+        setValue(key, studentData[key]);
+      }
+    });
+
+    if (studentData.photo) {
+      setPhotoPreview(`http://localhost:3000/uploads/${studentData.photo}`);
+    }
+  }
+}, [studentData, setValue]);
+
+
+  // ✅ Mutation to update student
+  const mutation = useMutation({
+  mutationFn: async (data) => {
+    return await axios.put(`/students/${id}`, data);
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries(['students']); // Optional: if you have list view
+    alert('Student updated');
+    navigate('/students');
+  },
+  onError: () => {
+    alert('Failed to update');
+  },
+});
+
+  // ✅ Handle form submission
+  const onSubmit = (data) => {
+    mutation.mutate(data);
   };
 
   const handleCancel = () => {
     navigate('/students');
   };
+
+  // if (isLoading) return <div>Loading student data...</div>;
+  // if (isError) return <div>Error loading student data.</div>;
 
   return (
     <div className="edit-student-container">
@@ -72,8 +110,12 @@ export default function EditStudent() {
         )}
 
         <div className="edit-buttons">
-          <button type="submit" className="edit-button-save">Save Changes</button>
-          <button type="button" className="edit-button-cancel" onClick={handleCancel}>Cancel</button>
+          <button type="submit" className="edit-button-save" disabled={mutation.isLoading}>
+            {mutation.isLoading ? 'Saving...' : 'Save Changes'}
+          </button>
+          <button type="button" className="edit-button-cancel" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       </form>
     </div>
